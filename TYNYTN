@@ -1,0 +1,51 @@
+import numpy as np
+dt = np.dtype(
+    [
+        ("course_title", "U100"),
+        ("price", "f8"),
+        ("num_subscribers", "i8"),
+        ("num_lectures", "i8"),
+        ("level", "U50"),
+        ("content_duration", "f8"),
+    ]
+)
+try:
+    data = np.genfromtxt(
+        "udemy_courses.csv",
+        delimiter=",",
+        names=True,
+        dtype=dt,
+        encoding="utf-8",
+        autostrip=True,
+    )
+except FileNotFoundError:
+    exit('Файл не найден')
+except ValueError:
+    exit("Файл содержит некорректный CSV или нарушена структура")
+if data is None or data.size == 0:
+    exit("Файл пуст или содержит только заголовки")
+expected_headers = (
+    "course_title",
+    "price",
+    "num_subscribers",
+    "num_lectures",
+    "level",
+    "content_duration",
+)
+if data.dtype.names != expected_headers:
+    exit("Некорректная структура файла")
+prices = data["price"]
+subscribers = data["num_subscribers"]
+lectures = data["num_lectures"]
+levels = data["level"]
+durations = data["content_duration"]
+mean_price = np.mean(prices)
+min_subscribers = np.min(subscribers)
+max_duration = np.max(durations)
+unique_levels, levels_encoded = np.unique(levels, return_inverse=True)
+counts = np.bincount(levels_encoded)
+most_frequent_level = unique_levels[np.argmax(counts)]
+print(f"Средняя цена на курс: {mean_price}")
+print(f"Минимальное число подписчиков: {min_subscribers}")
+print(f"Максимальная продолжительность лекций: {max_duration}")
+print(f"Уровень с наибольшим количеством курсов: {most_frequent_level}")
